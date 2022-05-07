@@ -31,6 +31,15 @@ async function run() {
             const products = await cursor.toArray();
             res.send(products);
         });
+        // LOAD PRODUCT FOR SINGE USER
+        app.get("/product", async (req, res) => {
+            const email = req.body.email;
+            console.log(email);
+            const query = { email };
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
+        });
 
         //LOAD SINGLE DATA DETAIL
         app.get("/product/:id", async (req, res) => {
