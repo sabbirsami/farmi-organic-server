@@ -32,10 +32,10 @@ async function run() {
             res.send(products);
         });
         // LOAD PRODUCT FOR SINGE USER
-        app.get("/product", async (req, res) => {
-            const email = req.body.email;
+        app.get("/order", async (req, res) => {
+            const email = req.query.email;
             console.log(email);
-            const query = { email };
+            const query = { email: email };
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
