@@ -11,8 +11,6 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("running Farmi Organic server");
 });
-//jnUfgvVwlknnsKkJ
-//farmiOrganic
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.up3hj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -55,6 +53,26 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
             res.send(result);
+        });
+
+        app.put("/product/:id", async (req, res) => {
+            const newProduct = req.body;
+            const id = req.params.id;
+            console.log(newProduct);
+            const query = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    quantity: newProduct.updateQuantity,
+                },
+            };
+            const result = await productCollection.updateOne(
+                query,
+                updateDoc,
+                options
+            );
+            res.send(result);
+            console.log(result);
         });
     } finally {
     }
