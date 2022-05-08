@@ -15,6 +15,17 @@ app.get("/", (req, res) => {
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: "Unauthorized access" });
+    }
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: "Forbidden access" });
+        }
+        console.log(decoded);
+        req.decoded = decoded;
+    });
     console.log("inside", authHeader);
     next();
 }
@@ -49,14 +60,17 @@ async function run() {
         });
         // LOAD PRODUCT FOR SINGE USER
         app.get("/myItem", verifyJWT, async (req, res) => {
-            const authHeader = req.headers.authorization;
-            console.log(authHeader);
+            const decodedEmail = req.decoded.email;
             const email = req.query.email;
             console.log(email);
-            const query = { email: email };
-            const cursor = productCollection.find(query);
-            const products = await cursor.toArray();
-            res.send(products);
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = productCollection.find(query);
+                const products = await cursor.toArray();
+                res.send(products);
+            } else {
+                res.status(403).send({ message: "Forbidden access" });
+            }
         });
 
         //LOAD SINGLE DATA DETAIL
